@@ -1,0 +1,26 @@
+body {
+    font: normal 12px Verdana;
+}
+
+#page {
+    width: 100%;
+}
+
+#left_side {
+    float:left;
+    width: 45%;
+}
+
+.btn {
+    border: 1px solid #DDDDE3;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    padding: 2px 8px 2px 8px;
+    background: white;
+    outline: none;
+}
+
+.btn:hover {
+    border: 1px solid #DDDDE3;
+    background: #3cb0fd;
+}

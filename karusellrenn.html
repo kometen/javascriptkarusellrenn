@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="pikaday.min.css">
+    <title>Karusellrenn</title>
+</head>
+<body>
+    <div id="page">
+        <div id="left_side">
+            <div>
+                <p>Add new race</p>
+                <input type="text" id="locationText" placeholder="Location">
+                <input type="text" id="racenameText" placeholder="Racename">
+                <input type="text" id="dateText" placeholder="Date">
+                <button onclick="addRace()" class="btn" id="addRaceButton">Add</button>
+            </div>
+            <div>
+                <p>
+                    <button onclick="getComingRaces()" class="btn" id="getComingRacesButton">Fetch</button>
+                    coming races.
+                    <div id="comingRaces"></div>
+                </p>
+            </div>
+        </div>
+        <div>
+            <button onclick="getMatchesWithoutDate()" class="btn" id="gamesWithoutDateButton">Fetch</button>
+            matches with unassigned dates.
+            <div id="matchesWithoutDate"></div>
+        </div>
+    </div>
+    <div>
+    </div>
+    <script type="text/javascript" src="func.js"></script>
+    <script type="text/javascript" src="moment.min.js"></script>
+    <script type="text/javascript" src="moment_dk.min.js"></script>
+    <script type="text/javascript" src="pikaday.min.js"></script>
+</body>
+</html>
