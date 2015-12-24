@@ -1,5 +1,5 @@
 body {
-    font: normal 12px Verdana;
+    font: normal 14px Verdana;
 }
 
 #page {
@@ -10,9 +10,17 @@ th {
     text-align: left;
 }
 
+.center_align_text {
+    text-align: center;
+}
+
+.right_align_text {
+    text-align: right;
+}
+
 #left_side {
     float:left;
-    width: 45%;
+    width: 50%;
 }
 
 .btn {

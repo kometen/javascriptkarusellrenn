@@ -33,48 +33,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // If it's an array, ie. has data.
                 if (Array.isArray(receivedMsg.races)) {
-                    div.innerHTML = "<table id='coming_races'><tr><th>Dato</th><th>Hvor</th><th>Renn</th></tr></table>";
+                    var tbl = "<table id='coming_races'><tr><th>Dato</th><th>Hvor</th>";
+                    tbl = tbl + "<th>Renn</th><th>Interval</th><th>Vælg</th></tr></table>";
+                    div.innerHTML = tbl;
                     var table = document.getElementById("coming_races");
                     receivedMsg.races.forEach(function (element, index, array) {
 
                         var row_1 = table.insertRow(-1);
                         var cell_date = row_1.insertCell(0);
-                        var cell_1 = row_1.insertCell(1);
-                        var cell_2 = row_1.insertCell(2);
+                        var cell_location = row_1.insertCell(1);
+                        var cell_racename = row_1.insertCell(2);
+                        var cell_interval = row_1.insertCell(3);
+                        var cell_select = row_1.insertCell(4);
 
                         cell_date.innerHTML = moment(element.racestart_at).format("DD. MMM HH:mm");
-                        cell_1.innerHTML = element.location;
-                        cell_2.innerHTML = element.racename;
-                        cell_2.id = "race_" + element.id;
+                        cell_location.innerHTML = element.location;
+                        cell_racename.innerHTML = element.racename;
+                        cell_interval.innerHTML = element.interval + " sek.";
+                        cell_interval.className = "right_align_text";
+                        cell_select.innerHTML = "<input type='radio'>";
+                        cell_select.className = "center_align_text";
+                        cell_select.id = "race_" + element.id;
 
-                        // Add eventlistener() to start a match.
+                        // Add eventlistener() to select a race.
                         document.getElementById("race_" + element.id).addEventListener("click", function () {
-                            var d = new Date();
+                            // Set race related values when adding a participant
+                            document.getElementById("locationHidden").value = element.location;
+                            document.getElementById("racenameHidden").value = element.racename;
+                            document.getElementById("dateHidden").value = element.racestart_at;
+                            // Erase any values that may have been assigned to a participant
+                            document.getElementById("nameText").value = "";
+                            document.getElementById("genderText").value = "";
+                            document.getElementById("bornText").value = "";
+                            document.getElementById("clubText").value = "";
                             var msg = {
-                                "type": "start_match",
+                                "type": "get participants",
                                 "id": element.id,
-                                "league": element.league,
-                                "season": element.season,
-                                "hometeam": element.hometeam,
-                                "awayteam": element.awayteam
+                                "location": element.location,
+                                "racename": element.racename,
+                                "racestart_at": element.racestart_at
                             }
                             msg = JSON.stringify(msg);
                             ws.send(msg);
                         });
                     });
                 } else {
-                    div.innerHTML = "No races registered."
-                    // Add eventlistener() to start a match.
-                    document.getElementById("get_coming_matches").addEventListener("click", function () {
-                        var d = new Date();
-                        var msg = {
-                            "type": "get_coming_matches",
-                            "league": window.league,
-                            "season": window.season,
-                        }
-                        msg = JSON.stringify(msg);
-                        ws.send(msg);
+                    div.innerHTML = "No races registered, please add race."
+                }
+            }
+
+            if (receivedMsg.type == "participants") {
+                var div = document.getElementById("participants");
+
+                // If it's an array, ie. has data.
+                if (Array.isArray(receivedMsg.participants)) {
+                    var tbl = "<table id='participantsTable'><tr><th>Navn</th><th>Årstal</th>";
+                    tbl = tbl + "<th>Klub</th><th>Start</th></tr></table>";
+                    div.innerHTML = tbl;
+                    var table = document.getElementById("participantsTable");
+                    receivedMsg.participants.forEach(function (element, index, array) {
+
+                        var row_1 = table.insertRow(-1);
+                        var cell_name = row_1.insertCell(0);
+                        var cell_born = row_1.insertCell(1);
+                        var cell_club = row_1.insertCell(2);
+                        var cell_start_at = row_1.insertCell(3);
+
+                        cell_name.innerHTML = element.name;
+                        cell_born.innerHTML = element.born;
+                        cell_club.innerHTML = element.club;
+                        cell_start_at.innerHTML = moment(element.start_at).format("HH:mm");
+
+                        // Add eventlistener() to select a race.
+                        /*document.getElementById("rparticipant_" + element.id).addEventListener("click", function () {
+                            var msg = {
+                                "type": "select participant",
+                                "id": element.id,
+                                "location": element.location,
+                                "racename": element.racename
+                            }
+                            msg = JSON.stringify(msg);
+                            ws.send(msg);
+                        });*/
                     });
+                } else {
+                    div.innerHTML = "No participants registered, select a race on the left or add one to the current."
                 }
             }
 
@@ -87,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
         ws.onerror = function (e) {
             alert("Unable to connect");
         }
-        
+
         ws.onclose = function (e) {
             // For safari
             if (e.code == 1006) {
@@ -101,26 +144,46 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-document.getElementById("getComingRacesButton").addEventListener("click", function getComingRaces () {
-    var msg = {
-        "type": "get races"
-    }
-    msg = JSON.stringify(msg);
-    ws.send(msg);
-});
-
 document.getElementById("addRaceButton").addEventListener("click", function addRace () {
     var location = document.getElementById("locationText").value;
     var racename = document.getElementById("racenameText").value;
-    var date = document.getElementById("dateText").value;
-    if (location.length == 0 || racename.length == 0 || date.length == 0) {
+    var racestart_at = document.getElementById("dateText").value;
+    var interval = document.getElementById("intervalText").value;
+    if (location.length == 0 || racename.length == 0 || racestart_at.length == 0 || interval.length == 0) {
         alert("One or more values are not filled in");
     } else {
         var msg = {
             "type": "add race",
             "location": location,
             "racename": racename,
-            "date": date
+            "racestart_at": racestart_at,
+            "interval": interval
+        }
+        msg = JSON.stringify(msg);
+        ws.send(msg);
+    }
+});
+
+document.getElementById("addParticipantButton").addEventListener("click", function addParticipant () {
+    var location = document.getElementById("locationHidden").value;
+    var racename = document.getElementById("racenameHidden").value;
+    var racestart_at = document.getElementById("dateHidden").value;
+    var name = document.getElementById("nameText").value;
+    var gender = document.getElementById("genderText").value;
+    var born = document.getElementById("bornText").value;
+    var club = document.getElementById("clubText").value;
+    if (name.length == 0 || gender.length == 0 || born.length == 0 || club.length == 0) {
+        alert("One or more values are not filled in");
+    } else {
+        var msg = {
+            "type": "add participant",
+            "location": location,
+            "racename": racename,
+            "racestart_at": racestart_at,
+            "name": name,
+            "gender": gender,
+            "born": born,
+            "club": club
         }
         msg = JSON.stringify(msg);
         ws.send(msg);
