@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         cell_racename.innerHTML = element.racename;
                         cell_interval.innerHTML = element.interval + " sek.";
                         cell_interval.className = "right_align_text";
-                        cell_select.innerHTML = "<input type='radio'>";
+                        cell_select.innerHTML = "<input type='radio' name='race'>";
                         cell_select.className = "center_align_text";
                         cell_select.id = "race_" + element.id;
 
