@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             document.getElementById("locationHidden").value = element.location;
                             document.getElementById("racenameHidden").value = element.racename;
                             document.getElementById("dateHidden").value = element.racestart_at;
+                            document.getElementById("intervalHidden").value = element.interval;
                             // Erase any values that may have been assigned to a participant
                             document.getElementById("nameText").value = "";
                             document.getElementById("genderText").value = "";
@@ -87,22 +88,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // If it's an array, ie. has data.
                 if (Array.isArray(receivedMsg.participants)) {
-                    var tbl = "<table id='participantsTable'><tr><th>Navn</th><th>Årstal</th>";
+                    var tbl = "<table id='participantsTable'><tr><th>Startnr</th><th>Navn</th><th>Årstal</th>";
                     tbl = tbl + "<th>Klub</th><th>Start</th></tr></table>";
                     div.innerHTML = tbl;
                     var table = document.getElementById("participantsTable");
+                    var interval_var = document.getElementById("intervalHidden").value;
                     receivedMsg.participants.forEach(function (element, index, array) {
 
                         var row_1 = table.insertRow(-1);
-                        var cell_name = row_1.insertCell(0);
-                        var cell_born = row_1.insertCell(1);
-                        var cell_club = row_1.insertCell(2);
-                        var cell_start_at = row_1.insertCell(3);
+                        var cell_startnr = row_1.insertCell(0);
+                        var cell_name = row_1.insertCell(1);
+                        var cell_born = row_1.insertCell(2);
+                        var cell_club = row_1.insertCell(3);
+                        var cell_start_at = row_1.insertCell(4);
 
+                        cell_startnr.innerHTML = element.raceid || index + 1;
+                        cell_startnr.className = "right_align_text";
                         cell_name.innerHTML = element.name;
                         cell_born.innerHTML = element.born;
                         cell_club.innerHTML = element.club;
-                        cell_start_at.innerHTML = moment(element.start_at).format("HH:mm");
+                        cell_start_at.innerHTML = moment(element.start_at || element.racestart_at).add(interval_var * index, 'seconds').format("HH:mm:ss");
 
                         // Add eventlistener() to select a race.
                         /*document.getElementById("rparticipant_" + element.id).addEventListener("click", function () {
