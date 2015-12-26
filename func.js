@@ -111,8 +111,20 @@ document.addEventListener("DOMContentLoaded", function () {
                         cell_born.innerHTML = element.born;
                         cell_club.innerHTML = element.club;
                         cell_start_at.innerHTML = moment(element.start_at || element.racestart_at).add(interval_var * index, 'seconds').format("HH:mm:ss");
-                        cell_edit.innerHTML = "<button class='btn' id='editParticipantButton" + element.id + "'>Edit</button>";
+                        cell_edit.innerHTML = "<button class='btn' id='editParticipantButton_" + element.id + "'>Edit</button>";
                         cell_delete.innerHTML = "<button class='btn' id='deleteParticipantButton_" + element.id + "'>Delete</button>";
+
+                        document.getElementById("editParticipantButton_" + element.id).addEventListener("click", function editParticipant () {
+                            document.getElementById("nameText").value = element.name;
+                            if (element.gender == "female") {
+                                document.getElementById("femaleGenderButton").checked = true;
+                            }
+                            if (element.gender == "male") {
+                                document.getElementById("maleGenderButton").checked = true;
+                            }
+                            document.getElementById("bornText").value = element.born;
+                            document.getElementById("clubText").value = element.club;
+                        });
 
                         document.getElementById("deleteParticipantButton_" + element.id).addEventListener("click", function deleteParticipant () {
                             var confirm_deletion = confirm("Delete the participant?");
