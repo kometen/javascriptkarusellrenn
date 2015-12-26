@@ -62,12 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             document.getElementById("racenameHidden").value = element.racename;
                             document.getElementById("dateHidden").value = element.racestart_at;
                             document.getElementById("intervalHidden").value = element.interval;
-                            // Erase any values that may have been assigned to a participant
-                            document.getElementById("nameText").value = "";
-                            document.getElementById("femaleGenderButton").checked = false;
-                            document.getElementById("maleGenderButton").checked = false;
-                            document.getElementById("bornText").value = "";
-                            document.getElementById("clubText").value = "";
+                            resetParticipantInformation();
                             var msg = {
                                 "type": "get participants",
                                 "id": element.id,
@@ -114,7 +109,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         cell_edit.innerHTML = "<button class='btn' id='editParticipantButton_" + element.id + "'>Edit</button>";
                         cell_delete.innerHTML = "<button class='btn' id='deleteParticipantButton_" + element.id + "'>Delete</button>";
 
-                        document.getElementById("editParticipantButton_" + element.id).addEventListener("click", function editParticipant () {
+                        document.getElementById("editParticipantButton_" + element.id).addEventListener("click", function updateParticipant () {
+                            document.getElementById("addOrUpdateParticipant").value = "update";
+                            document.getElementById("participantID").value = element.id;
                             document.getElementById("nameText").value = element.name;
                             if (element.gender == "female") {
                                 document.getElementById("femaleGenderButton").checked = true;
@@ -213,8 +210,18 @@ document.getElementById("addParticipantButton").addEventListener("click", functi
     if (name.length == 0 || gender.length == 0 || born.length == 0 || club.length == 0) {
         alert("One or more values are not filled in");
     } else {
+        var addOrUpdate = document.getElementById("addOrUpdateParticipant").value;
+        var participantID = document.getElementById("participantID").value;
+        if (addOrUpdate == "add") {
+            type = "add participant";
+        }
+        if (addOrUpdate == "update") {
+            type = "update participant";
+            resetParticipantInformation();
+        }
         var msg = {
-            "type": "add participant",
+            "type": type,
+            "id": participantID,
             "location": location,
             "racename": racename,
             "racestart_at": racestart_at,
@@ -225,6 +232,9 @@ document.getElementById("addParticipantButton").addEventListener("click", functi
         }
         msg = JSON.stringify(msg);
         ws.send(msg);
+        // Set default values.
+        document.getElementById("addOrUpdateParticipant").value = "add";
+        document.getElementById("participantID").value = "0";
     }
 });
 
@@ -234,4 +244,13 @@ function testWebsocket () {
     } else {
         alert("Websocket unsupported");
     }
+}
+
+function resetParticipantInformation () {
+    // Erase any values that may have been assigned to a participant
+    document.getElementById("nameText").value = "";
+    document.getElementById("femaleGenderButton").checked = false;
+    document.getElementById("maleGenderButton").checked = false;
+    document.getElementById("bornText").value = "";
+    document.getElementById("clubText").value = "";
 }
