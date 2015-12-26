@@ -64,7 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
                             document.getElementById("intervalHidden").value = element.interval;
                             // Erase any values that may have been assigned to a participant
                             document.getElementById("nameText").value = "";
-                            document.getElementById("genderText").value = "";
+                            document.getElementById("femaleGenderButton").checked = false;
+                            document.getElementById("maleGenderButton").checked = false;
                             document.getElementById("bornText").value = "";
                             document.getElementById("clubText").value = "";
                             var msg = {
@@ -101,6 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         var cell_born = row_1.insertCell(2);
                         var cell_club = row_1.insertCell(3);
                         var cell_start_at = row_1.insertCell(4);
+                        var cell_edit = row_1.insertCell(5);
+                        var cell_delete = row_1.insertCell(6);
 
                         cell_startnr.innerHTML = element.raceid || index + 1;
                         cell_startnr.className = "right_align_text";
@@ -108,18 +111,30 @@ document.addEventListener("DOMContentLoaded", function () {
                         cell_born.innerHTML = element.born;
                         cell_club.innerHTML = element.club;
                         cell_start_at.innerHTML = moment(element.start_at || element.racestart_at).add(interval_var * index, 'seconds').format("HH:mm:ss");
+                        cell_edit.innerHTML = "<button class='btn' id='editParticipantButton" + element.id + "'>Edit</button>";
+                        cell_delete.innerHTML = "<button class='btn' id='deleteParticipantButton_" + element.id + "'>Delete</button>";
 
-                        // Add eventlistener() to select a race.
-                        /*document.getElementById("rparticipant_" + element.id).addEventListener("click", function () {
-                            var msg = {
-                                "type": "select participant",
-                                "id": element.id,
-                                "location": element.location,
-                                "racename": element.racename
+                        document.getElementById("deleteParticipantButton_" + element.id).addEventListener("click", function deleteParticipant () {
+                            var confirm_deletion = confirm("Delete the participant?");
+                            if (confirm_deletion == true) {
+                                var location = document.getElementById("locationHidden").value;
+                                var racename = document.getElementById("racenameHidden").value;
+                                var racestart_at = document.getElementById("dateHidden").value;
+                                var msg = {
+                                    "type": "delete participant",
+                                    "location": location,
+                                    "racename": racename,
+                                    "racestart_at": racestart_at,
+                                    "name": element.name,
+                                    "gender": element.gender,
+                                    "born": element.born,
+                                    "club": element.club
+                                }
+                                msg = JSON.stringify(msg);
+                                ws.send(msg);
                             }
-                            msg = JSON.stringify(msg);
-                            ws.send(msg);
-                        });*/
+                        });
+
                     });
                 } else {
                     div.innerHTML = "No participants registered, select a race on the left or add one to the current."
@@ -174,7 +189,13 @@ document.getElementById("addParticipantButton").addEventListener("click", functi
     var racename = document.getElementById("racenameHidden").value;
     var racestart_at = document.getElementById("dateHidden").value;
     var name = document.getElementById("nameText").value;
-    var gender = document.getElementById("genderText").value;
+    var gender = "";
+    if (document.getElementById("femaleGenderButton").checked) {
+        gender = "female";
+    }
+    if (document.getElementById("maleGenderButton").checked) {
+        gender = "male";
+    }
     var born = document.getElementById("bornText").value;
     var club = document.getElementById("clubText").value;
     if (name.length == 0 || gender.length == 0 || born.length == 0 || club.length == 0) {
